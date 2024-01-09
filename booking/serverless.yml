@@ -1,0 +1,58 @@
+service: Serverless-Boiler-Plate
+frameworkVersion: '3'
+
+plugins:
+  - serverless-offline
+  - serverless-plugin-typescript
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  stage: local
+  region: eu-north-1
+  apiKeys:
+    -  ${self:custom.API_KEY.${self:custom.stage}}
+    #apikey_1_${self:custom.stage}
+  environment:
+    STAGE: ${self:custom.stage}
+    DB_HOST: ${self:custom.DB_HOST.${self:custom.stage}}
+    DB_USER: ${self:custom.DB_USER.${self:custom.stage}}
+    DB_NAME: ${self:custom.DB_NAME.${self:custom.stage}}
+    DB_PASSWORD: ${self:custom.DB_PASSWORD.${self:custom.stage}}
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  DB_DIALECT:
+    local: postgres
+  DB_HOST:
+    local: localhost
+  DB_USER:
+    local: postgres
+  DB_NAME:
+    local: booking_db
+  DB_PASSWORD:
+    local: sa
+  API_KEY:
+  local: 6ZWI88ePzT5PXddHZYNkE4VG1Q36GBoW3mq4F1ea  
+  functions:
+  # Bookings Endpoints
+  
+  getBook:
+    handler: ./src/functions/book/handler.getBook
+    timeout: 900
+    events:
+      - http:
+          method: get
+          path: books/{isbn}
+          private: false 
+  addBook:
+    handler: ./src/functions/booking/handler.addBook
+    timeout: 900
+    events:
+      - http:
+          method: post
+          path: books
+          private: false
+        
+  
+  
